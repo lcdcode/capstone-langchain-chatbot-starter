@@ -1,9 +1,16 @@
 from flask import Flask, render_template
 from flask import request, jsonify, abort
 
-from langchain.llms import Cohere
+# Added per Cohere docs
+from langchain_cohere import ChatCohere
+from langchain_core.messages import AIMessage, HumanMessage
+from langchain.memory import ConversationBufferWindowMemory
+from langchain.chains import ConversationChain
+
 
 app = Flask(__name__)
+# Initialize cohere once per app instance
+chat = ChatCohere()
 
 def answer_from_knowledgebase(message):
     # TODO: Write your code here
@@ -15,8 +22,25 @@ def search_knowledgebase(message):
     return sources
 
 def answer_as_chatbot(message):
-    # TODO: Write your code here
-    return ""
+
+    # Initialize the LLM only once (stored on the function object)
+    if not hasattr(answer_as_chatbot, "_chat"):
+        # One-time creation of the Cohere chat model
+        answer_as_chatbot._chat = ChatCohere()
+        # And an empty list that will hold the conversation history
+        answer_as_chatbot._memory = []
+
+    # Append the new user turn to the history
+    answer_as_chatbot._memory.append(HumanMessage(content=message))
+
+    # Ask Cohere for a reply using the *entire* history
+    ai_msg: AIMessage = answer_as_chatbot._chat.invoke(answer_as_chatbot._memory)
+
+    # Store the bot’s reply so future calls can see it
+    answer_as_chatbot._memory.append(ai_msg)
+
+    # Return just the text to the caller
+    return ai_msg.content
 
 @app.route('/kbanswer', methods=['POST'])
 def kbanswer():
