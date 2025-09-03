@@ -9,8 +9,6 @@ from langchain.chains import ConversationChain
 
 
 app = Flask(__name__)
-# Initialize cohere once per app instance
-chat = ChatCohere()
 
 def answer_from_knowledgebase(message):
     # TODO: Write your code here
