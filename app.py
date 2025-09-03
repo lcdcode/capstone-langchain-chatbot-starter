@@ -2,11 +2,13 @@ from flask import Flask, render_template
 from flask import request, jsonify, abort
 
 # Added per Cohere docs
-from langchain_cohere import ChatCohere
-from langchain_core.messages import AIMessage, HumanMessage
-from langchain.memory import ConversationBufferWindowMemory
-from langchain.chains import ConversationChain
-
+# from langchain_cohere import ChatCohere
+# from langchain_core.messages import AIMessage, HumanMessage
+# from langchain.memory import ConversationBufferWindowMemory
+# from langchain.chains import ConversationChain
+from langchain.llms import Cohere
+from langchain.prompts import PromptTemplate
+from langchain.chains import LLMChain
 
 app = Flask(__name__)
 
@@ -21,24 +23,43 @@ def search_knowledgebase(message):
 
 def answer_as_chatbot(message):
 
-    # Initialize the LLM only once (stored on the function object)
-    if not hasattr(answer_as_chatbot, "_chat"):
-        # One-time creation of the Cohere chat model
-        answer_as_chatbot._chat = ChatCohere()
-        # And an empty list that will hold the conversation history
-        answer_as_chatbot._memory = []
+    # Create LLM/prompt only once
+    if not hasattr(answer_as_chatbot, "_chain"):
+        # a simple prompt that appends the conversation history
+        template_str = (
+            "{history}\n"
+            "Human: {human_input}\n"
+            "Assistant:"
+        )
+        prompt = PromptTemplate(
+            input_variables=["history", "human_input"],
+            template=template_str,
+        )
+        # Cohere LLM (text‑generation endpoint, not chat)
+        llm = Cohere(
+            model="command-xlarge",
+            temperature=0.7,
+        )
+        # Build a chain that plugs the prompt into the LLM
+        answer_as_chatbot._chain = LLMChain(llm=llm, prompt=prompt)
 
-    # Append the new user turn to the history
-    answer_as_chatbot._memory.append(HumanMessage(content=message))
+        # Keep the conversation history as a plain string
+        answer_as_chatbot._history = ""
 
-    # Ask Cohere for a reply using the *entire* history
-    ai_msg: AIMessage = answer_as_chatbot._chat.invoke(answer_as_chatbot._memory)
+    # Run the chain with the new user turn
+    assistant_reply = answer_as_chatbot._chain.run(
+        {
+            "history": answer_as_chatbot._history,
+            "human_input": message,
+        }
+    ).strip()
 
-    # Store the bot’s reply so future calls can see it
-    answer_as_chatbot._memory.append(ai_msg)
+    # Update the history for the next call -- keep the history in the same format that the prompt expects
+    new_entry = f"Human: {message}\nAssistant: {assistant_reply}\n"
+    answer_as_chatbot._history += new_entry
 
-    # Return just the text to the caller
-    return ai_msg.content
+    # Return the reply
+    return assistant_reply
 
 @app.route('/kbanswer', methods=['POST'])
 def kbanswer():
