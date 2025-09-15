@@ -1,3 +1,9 @@
+// Handle clear button click event
+let clearButton = document.getElementById('clear-btn');
+clearButton.addEventListener('click', function() {
+    let chatContainer = document.getElementById('chat-container');
+    chatContainer.innerHTML = '';
+});
 function sendMessage() {
     let messageInput = document.getElementById('message-input');
     let message = messageInput.value;
@@ -72,11 +78,21 @@ function displayMessage(sender, message) {
     messageDiv.appendChild(timestamp);
 
     chatContainer.appendChild(messageDiv);
-
-    // Scroll to the bottom of the chat container
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+    // Auto-scroll to the bottom of the chat container after new message
+    setTimeout(() => {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }, 50);
 }
 
 // Handle button click event
 let sendButton = document.getElementById('send-btn');
 sendButton.addEventListener('click', sendMessage);
+
+// Send message when Enter is pressed in the input field
+let messageInput = document.getElementById('message-input');
+messageInput.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        sendMessage();
+    }
+});
