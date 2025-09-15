@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Thinkbot</title>
+    <title>The Not-So-Quantum Thinkbot</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="static/style.css">
 </head>
 <body>
     <div class="container mt-5">
-        <div id="chat-container" class="chat-container"></div>
+        <div id="chat-container" class="chat-container" style="background-image: url('static/thinkbot.png'); background-size: cover; background-blend-mode: lighten;"></div>
         <div class="row">
             <div class="col">
                 <div>
                     <select class="form-control" id="function-select">
                         <option value="answer">Answer as Chatbot</option>
+                        <option value="kbanswer">Answer from Knowledgebase</option>
+                        <option value="search">Search Knowledgebase</option>
                     </select>
                 </div>
             </div>
@@ -20,6 +22,7 @@
                 <div class="input-group-append">
                     <input type="text" id="message-input" placeholder="Type your message here...">
                     <button id="send-btn" class="btn btn-primary">Send</button>
+                    <button id="clear-btn" class="btn btn-secondary ml-2">Clear</button>
                 </div>
             </div>
         </div>
