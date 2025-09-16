@@ -1,0 +1,7 @@
+chromadb
+Flask
+langchain
+langchainplus-sdk
+gunicorn
+gevent
+langchain-cohere
