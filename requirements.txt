@@ -70,12 +70,16 @@ frozenlist==1.7.0
     #   aiosignal
 fsspec==2025.9.0
     # via huggingface-hub
+gevent==25.8.2
+    # via -r requirements.in
 google-auth==2.40.3
     # via kubernetes
 googleapis-common-protos==1.70.0
     # via opentelemetry-exporter-otlp-proto-grpc
 greenlet==3.2.4
-    # via sqlalchemy
+    # via
+    #   gevent
+    #   sqlalchemy
 grpcio==1.74.0
     # via
     #   chromadb
@@ -251,9 +255,7 @@ pydantic==1.10.23
     #   langchainplus-sdk
     #   langsmith
 pydantic-core==2.33.2
-    # via
-    #   cohere
-    #   pydantic
+    # via cohere
 pygments==2.19.2
     # via rich
 pypika==0.48.9
@@ -362,7 +364,6 @@ typing-extensions==4.15.0
     #   sqlalchemy
     #   typer
     #   typing-inspect
-    #   typing-inspection
 typing-inspect==0.9.0
     # via dataclasses-json
 tzdata==2025.2
@@ -388,3 +389,10 @@ yarl==1.20.1
     # via aiohttp
 zipp==3.23.0
     # via importlib-metadata
+zope-event==6.0
+    # via gevent
+zope-interface==8.0
+    # via gevent
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
